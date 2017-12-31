@@ -18,7 +18,6 @@ game_data = {
     }
 }
 
-
 def game_play():
     #pulling number of guesses allowed from game_data structure
     number_of_guesses = game_data[select_level]['number_of_guesses']
@@ -40,8 +39,7 @@ def game_play():
             #if number_of_guesses == 0 reset game
             print '\nYou Lose! Let\'s play again!'
             on_load()
-
-
+            
     #if they're correct print the new version of the quiz with first answer filled in!
     if first_question == first_answer:
         replace_quiz = game_data[select_level]['quiz']
@@ -92,8 +90,6 @@ def game_play():
                 else:
                     print '\nYou Lose! Let\'s play again!'
                     on_load()
-
-
 
             if third_question == third_answer:
                 replace_quiz = replace_quiz.replace('__3__', third_answer)
