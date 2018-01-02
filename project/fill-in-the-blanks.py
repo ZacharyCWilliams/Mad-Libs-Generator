@@ -18,16 +18,26 @@ game_data = {
     }
 }
 
-
 quiz = None
 answers = None
 start_index = None
 number_of_guesses = None
 user_input = None
+answer = None
+index = None
+
+#global variables aren't working properly
 
 def incorrect_guess():
+    print answers
+    global number_of_guesses
+    print number_of_guesses
+    print quiz
+    global user_input
+    global answer
+
     if (user_input == answer):
-        game_play()
+        return
     while (user_input != answer):
         if (number_of_guesses > 2):
             number_of_guesses = number_of_guesses - 1
@@ -51,6 +61,8 @@ def game_play():
     start_index = 1
     global number_of_guesses
     number_of_guesses = game_data[select_level]['number_of_guesses']
+    global answer
+    global index
 
     for index, answer in enumerate(answers, start_index):
         while True:
@@ -66,8 +78,7 @@ def game_play():
                 if index == 5:
                     quiz = quiz.replace('__' + str(index) + '__', answer)
                     print '\nYay! You won! The final solution is:'
-                    print quiz
-                    print ''
+                    print quiz + '\n'
                     on_load()
             elif (user_input != answer):
                 incorrect_guess()
