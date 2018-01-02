@@ -18,55 +18,33 @@ game_data = {
     }
 }
 
-quiz = None
-answers = None
-start_index = None
-number_of_guesses = None
-user_input = None
-answer = None
-index = None
+one_guess = 1
 
-#global variables aren't working properly
-
-def incorrect_guess():
-    print answers
-    global number_of_guesses
-    print number_of_guesses
-    print quiz
-    global user_input
-    global answer
-
-    if (user_input == answer):
-        return
+def incorrect_guess(user_input, answer, quiz, answers, index, start_index, number_of_guesses):
     while (user_input != answer):
         if (number_of_guesses > 2):
-            number_of_guesses = number_of_guesses - 1
+            number_of_guesses = number_of_guesses - one_guess
             print '\nOops! That\'s not right. You have ' + str(number_of_guesses) + ' guesses left! Try again:'
             user_input = raw_input('What should be substituted for __' + str(index) + '__?')
         elif (number_of_guesses == 2):
-            number_of_guesses = number_of_guesses - 1
+            number_of_guesses = number_of_guesses - one_guess
             print '\nOops! That\'s not right. This is your LAST guess: make it count!'
             user_input = raw_input('What should be substituted for __' + str(index) + '__?')
         elif (number_of_guesses == 1):
                 print '\nYou Lose! Let\'s play again!\n'
-                on_load()
+                pick_a_level()
 
 
-def game_play():
-    global quiz
-    quiz = game_data[select_level]['quiz']
-    global answers
-    answers = game_data[select_level]['answers']
-    global start_index
-    start_index = 1
-    global number_of_guesses
-    number_of_guesses = game_data[select_level]['number_of_guesses']
-    global answer
-    global index
+def you_won(index, answer, quiz):
+    quiz = quiz.replace('__' + str(index) + '__', answer)
+    print '\nYay! You won! The final solution is:'
+    print quiz + '\n'
+    pick_a_level()
 
+
+def correct_answers(quiz, answers, start_index, number_of_guesses):
     for index, answer in enumerate(answers, start_index):
-        while True:
-            global user_input
+       while True:
             user_input = raw_input('\nWhat should be substituted for __' + str(index) + '__? ')
             if (user_input == answer):
                 print '\nThat\'s right!'
@@ -76,30 +54,34 @@ def game_play():
                 if index <= 4:
                     answer = answers[index- 1]
                 if index == 5:
-                    quiz = quiz.replace('__' + str(index) + '__', answer)
-                    print '\nYay! You won! The final solution is:'
-                    print quiz + '\n'
-                    on_load()
+                    you_won(index, answer, quiz)
             elif (user_input != answer):
-                incorrect_guess()
+                incorrect_guess(user_input, answer, quiz, answers, index, start_index, number_of_guesses)
 
 
-#set global variable to None so that all functions can access variable && we can set/reset variable in local scopes
-select_level = None
-#Game loads with this function
-def on_load():
-    global select_level
-    #user selects game level by typing in easy, medium, or hard
-    select_level = raw_input('Please select a game difficulty level by typing it in! \nPossible choices include easy, medium, and hard. ')
-    #if user input != viable game level ask again
-    if select_level != 'easy' and select_level != 'medium' and select_level != 'hard':
-        print '\nOops! That didn\'t work. Try again:\n'
-        on_load()
-    else:
+def setup_variables(select_level):
+    quiz = game_data[select_level]['quiz']
+    answers = game_data[select_level]['answers']
+    start_index = 1
+    number_of_guesses = game_data[select_level]['number_of_guesses']
+    return correct_answers(quiz, answers, start_index, number_of_guesses)
+
+def print_paragraph(select_level):
         print '\nYou\'ve chosen ' + str(select_level) + '! You will get five guesses per problem'
         #print quiz paragraph from level chosen
         paragraph = game_data[select_level]['quiz']
         print paragraph
         #move onto game play!
-        return game_play()
-on_load()
+        return setup_variables(select_level)
+
+#Game loads with this function
+def pick_a_level():
+    #user selects game level by typing in easy, medium, or hard
+    select_level = raw_input('Please select a game difficulty level by typing it in! \nPossible choices include easy, medium, and hard. ')
+    #if user input != viable game level ask again
+    if select_level != 'easy' and select_level != 'medium' and select_level != 'hard':
+        print '\nOops! That didn\'t work. Try again:\n'
+        pick_a_level()
+    else:
+        print_paragraph(select_level)
+pick_a_level()
