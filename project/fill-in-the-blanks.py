@@ -4,43 +4,51 @@ game_data = {
     'easy': {
     'quiz': '\nYou can run python in your text editor OR your __1__. We use an __2__ statement to assign variables to strings! A string is just a sequence of __3__ surrounded by quotes. We often use variables and strings inside of procedures. Another name for a procedure is a __4__.',
     'answers': ['command line', 'assignment', 'characters', 'function'],
-    'number_of_guesses': 5
+    'number_of_guesses': 5,
+    'start_index': 1
     },
     'medium': {
     'quiz': '\nWe create functions using the __1__ keyword. If you want to run a block of code as long as a statement is true, you can use a __2__ loop. Conditionals are another great tool at our disposal. Use an __3__ statement to check if something is true. You\'ll want to add an __4__ statement in case it isn\'t true.',
     'answers': ['def', 'while', 'if', 'else'],
-    'number_of_guesses': 5
+    'number_of_guesses': 5,
+    'start_index': 1
     },
     'hard': {
     'quiz': '\nStep one of Pythonista\'s guide to solving all problems is to understand the __1__. Step two is to understand the __2__! You can get a users input using the __3__ function. A list inside a list is called a __4__ list',
     'answers': ['inputs', 'outputs', 'raw_input', 'nested'],
-    'number_of_guesses': 5
+    'number_of_guesses': 5,
+    'start_index': 1
     }
 }
 
 one_guess = 1
+two_guesses_left = 2
+increment_index_by_one = 1
+decrement_index_by_one = 1
+last_index_of_playable_game = 4
+game_over_index = 5
 
 def incorrect_guess(user_input, answer, quiz, answers, index, start_index, number_of_guesses):
+    if (user_input == answer):
+        return
     while (user_input != answer):
-        if (number_of_guesses > 2):
+        if (number_of_guesses > two_guesses_left):
             number_of_guesses = number_of_guesses - one_guess
             print '\nOops! That\'s not right. You have ' + str(number_of_guesses) + ' guesses left! Try again:'
             user_input = raw_input('What should be substituted for __' + str(index) + '__?')
-        elif (number_of_guesses == 2):
+        elif (number_of_guesses == two_guesses_left):
             number_of_guesses = number_of_guesses - one_guess
             print '\nOops! That\'s not right. This is your LAST guess: make it count!'
             user_input = raw_input('What should be substituted for __' + str(index) + '__?')
-        elif (number_of_guesses == 1):
+        elif (number_of_guesses == one_guess):
                 print '\nYou Lose! Let\'s play again!\n'
                 pick_a_level()
-
 
 def you_won(index, answer, quiz):
     quiz = quiz.replace('__' + str(index) + '__', answer)
     print '\nYay! You won! The final solution is:'
     print quiz + '\n'
     pick_a_level()
-
 
 def correct_answers(quiz, answers, start_index, number_of_guesses):
     for index, answer in enumerate(answers, start_index):
@@ -50,19 +58,18 @@ def correct_answers(quiz, answers, start_index, number_of_guesses):
                 print '\nThat\'s right!'
                 quiz = quiz.replace('__' + str(index) + '__', answer)
                 print quiz
-                index = index + 1
-                if index <= 4:
-                    answer = answers[index- 1]
-                if index == 5:
+                index = index + increment_index_by_one
+                if (index <= last_index_of_playable_game):
+                    answer = answers[index - decrement_index_by_one]
+                if (index == game_over_index):
                     you_won(index, answer, quiz)
             elif (user_input != answer):
                 incorrect_guess(user_input, answer, quiz, answers, index, start_index, number_of_guesses)
 
-
 def setup_variables(select_level):
     quiz = game_data[select_level]['quiz']
     answers = game_data[select_level]['answers']
-    start_index = 1
+    start_index = game_data[select_level]['start_index']
     number_of_guesses = game_data[select_level]['number_of_guesses']
     return correct_answers(quiz, answers, start_index, number_of_guesses)
 
