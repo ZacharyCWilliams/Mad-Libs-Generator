@@ -27,19 +27,18 @@ increment_index_by_one = 1
 decrement_index_by_one = 1
 last_index_of_playable_game = 4
 game_over_index = 5
+refill_guesses = 5
 
 def incorrect_guess(user_input, answer, quiz, answers, index, start_index, number_of_guesses):
-    if (user_input == answer):
-        return
-    while (user_input != answer):
+    if (user_input != answer):
         if (number_of_guesses > two_guesses_left):
             number_of_guesses = number_of_guesses - one_guess
             print '\nOops! That\'s not right. You have ' + str(number_of_guesses) + ' guesses left! Try again:'
-            user_input = raw_input('What should be substituted for __' + str(index) + '__?')
+            check_input(quiz, answers, start_index, number_of_guesses, index, answer)
         elif (number_of_guesses == two_guesses_left):
             number_of_guesses = number_of_guesses - one_guess
             print '\nOops! That\'s not right. This is your LAST guess: make it count!'
-            user_input = raw_input('What should be substituted for __' + str(index) + '__?')
+            check_input(quiz, answers, start_index, number_of_guesses, index, answer)
         elif (number_of_guesses == one_guess):
                 print '\nYou Lose! Let\'s play again!\n'
                 pick_a_level()
@@ -50,19 +49,29 @@ def you_won(index, answer, quiz):
     print quiz + '\n'
     pick_a_level()
 
-def correct_answers(quiz, answers, start_index, number_of_guesses):
-    for index, answer in enumerate(answers, start_index):
+def correct_answers(user_input, answer, quiz, answers, index, start_index, number_of_guesses):
+    print '\nThat\'s right!'
+    quiz = quiz.replace('__' + str(index) + '__', answer)
+    print quiz
+    index = index + increment_index_by_one
+    if (index < last_index_of_playable_game):
+        answer = answers[index - increment_index_by_one]
+        check_input(quiz, answers, start_index, number_of_guesses, index, answer)
+    if (index == last_index_of_playable_game):
+        answer = answers[index - decrement_index_by_one]
+        check_input(quiz, answers, start_index, number_of_guesses, index, answer)
+    if (index == game_over_index):
+        you_won(index, answer, quiz)
+        return
+
+
+
+def check_input(quiz, answers, start_index, number_of_guesses, index, answer):
        while True:
             user_input = raw_input('\nWhat should be substituted for __' + str(index) + '__? ')
             if (user_input == answer):
-                print '\nThat\'s right!'
-                quiz = quiz.replace('__' + str(index) + '__', answer)
-                print quiz
-                index = index + increment_index_by_one
-                if (index <= last_index_of_playable_game):
-                    answer = answers[index - decrement_index_by_one]
-                if (index == game_over_index):
-                    you_won(index, answer, quiz)
+                number_of_guesses = refill_guesses
+                correct_answers(user_input, answer, quiz, answers, index, start_index, number_of_guesses)
             elif (user_input != answer):
                 incorrect_guess(user_input, answer, quiz, answers, index, start_index, number_of_guesses)
 
@@ -71,7 +80,10 @@ def setup_variables(select_level):
     answers = game_data[select_level]['answers']
     start_index = game_data[select_level]['start_index']
     number_of_guesses = game_data[select_level]['number_of_guesses']
-    return correct_answers(quiz, answers, start_index, number_of_guesses)
+    for index, answer in enumerate(answers, start_index):
+        return check_input(quiz, answers, start_index, number_of_guesses, index, answer)
+
+
 
 def print_paragraph(select_level):
         print '\nYou\'ve chosen ' + str(select_level) + '! You will get five guesses per problem'
